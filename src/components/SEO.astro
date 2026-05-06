@@ -1,0 +1,144 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  ogImage?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = '프로랩 인테리어필름 | 고양·파주 정품 필름 시공 전문 PROWRAP',
+  description = '고양·파주·인천·서울 인테리어필름 시공 전문 프로랩. 현대Bodaq, LX하우시스, 영림 등 정품 필름으로 주거·상가·사무실 리폼. 사진 한 장이면 당일 견적, 직거래 시공팀이 마감까지 책임집니다.',
+  canonical = Astro.url.href,
+  ogImage = 'https://prowrap.site/og-image.png',
+  noindex = false,
+} = Astro.props;
+
+const siteUrl = 'https://prowrap.site';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': ['LocalBusiness', 'HomeAndConstructionBusiness'],
+  name: '프로랩 인테리어필름 (PROWRAP)',
+  alternateName: 'PROWRAP Interior Film',
+  description: '고양·파주·인천·서울 인테리어필름 시공 전문. 주거·상가·사무실 리폼.',
+  url: siteUrl,
+  telephone: '+82-10-5074-1018',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '의장로 146 1903호',
+    addressLocality: '고양시 덕양구',
+    addressRegion: '경기도',
+    postalCode: '10469',
+    addressCountry: 'KR',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: 37.6325,
+    longitude: 126.8343,
+  },
+  areaServed: ['고양시', '파주시', '인천광역시', '서울특별시'],
+  serviceType: '인테리어필름 시공',
+  openingHoursSpecification: {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    opens: '09:00',
+    closes: '19:00',
+  },
+  sameAs: [
+    'https://www.instagram.com/prowrap_kr/',
+    'https://www.youtube.com/@PROWRAP_KR',
+    'https://m.blog.naver.com/milli1018',
+  ],
+  image: ogImage,
+  priceRange: '₩₩',
+};
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'PROWRAP Interior Film',
+  url: siteUrl,
+  logo: `${siteUrl}/favicon.svg`,
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: '+82-10-5074-1018',
+    contactType: 'customer service',
+    availableLanguage: 'Korean',
+  },
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    {
+      '@type': 'ListItem',
+      position: 1,
+      name: '홈',
+      item: siteUrl,
+    },
+  ],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: '인테리어필름 시공 견적은 어떻게 받나요?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '카카오톡으로 시공 부위 사진과 대략적인 면적을 보내주시면 당일 안에 항목별 견적을 드립니다. 현장 방문 없이도 자재 종류와 작업 범위를 먼저 파악해 안내합니다.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '고양·파주 외 지역도 인테리어필름 시공이 가능한가요?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '고양·파주를 기점으로 인천과 서울 전 지역으로 시공을 나갑니다. 원거리는 사전 문의 후 일정을 조율합니다.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '어떤 브랜드 필름을 사용하나요?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: '현대 Bodaq, LX하우시스, 영림, 예림, 한솔, 삼성 등 국내 정품 인테리어필름만 사용합니다. 자재 코드와 단가를 명세서에 별도 기재해 드립니다.',
+      },
+    },
+  ],
+};
+---
+
+<meta name="description" content={description} />
+<meta name="keywords" content="인테리어필름 시공, 고양 인테리어필름, 파주 인테리어필름, 정품 필름, 인테리어필름 리폼, 주거 필름 시공, 상가 필름, 사무실 필름" />
+<meta name="author" content="PROWRAP Interior Film" />
+{noindex
+  ? <meta name="robots" content="noindex, nofollow" />
+  : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+}
+<link rel="canonical" href={canonical} />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="프로랩 인테리어필름" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:locale" content="ko_KR" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+<script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+<script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />

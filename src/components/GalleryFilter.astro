@@ -1,0 +1,144 @@
+---
+
+import { filterOrder, spaceLabels } from '../data/spaceMapping';
+---
+
+<nav class="gallery-filter flex flex-wrap gap-x-1 gap-y-2" aria-label="갤러리 공간 필터">
+  <button
+    type="button"
+    class="filter-btn is-active"
+    data-filter="*"
+    aria-pressed="true"
+  >
+    전체
+  </button>
+  {filterOrder.map((key) => (
+    <button
+      type="button"
+      class="filter-btn"
+      data-filter={key}
+      aria-pressed="false"
+    >
+      {spaceLabels[key]}
+    </button>
+  ))}
+</nav>
+
+<style>
+  .filter-btn {
+    position: relative;
+    padding: 0.6rem 1rem;
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b6b6b;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    transition: color 200ms;
+    line-height: 1;
+  }
+  .filter-btn::after {
+    content: '';
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    bottom: 0.35rem;
+    height: 1px;
+    background: #ff7a1a;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 200ms ease;
+  }
+  .filter-btn:hover {
+    color: #1a1a1a;
+  }
+  .filter-btn.is-active {
+    color: #1a1a1a;
+  }
+  .filter-btn.is-active::after {
+    transform: scaleX(1);
+  }
+</style>
+
+<script>
+  function initGalleryFilter() {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+    const items = document.querySelectorAll<HTMLElement>('.gallery-item');
+    const loadMoreBtn = document.getElementById('load-more-btn');
+    const loadMoreContainer = document.getElementById('load-more-container');
+
+    if (!buttons.length || !items.length) return;
+
+    let currentFilter = '*';
+    let visibleCount = 9;
+    const increment = 9;
+
+    function renderGrid() {
+      let matchCount = 0;
+      let shownCount = 0;
+
+      items.forEach((item) => {
+        let isMatch = false;
+        if (currentFilter === '*') {
+          isMatch = true;
+        } else {
+          const cats = (item.dataset.categories ?? '').split(' ');
+          isMatch = cats.includes(currentFilter);
+        }
+
+        if (isMatch) {
+          matchCount++;
+          if (shownCount < visibleCount) {
+            item.style.display = '';
+            item.hidden = false;
+            shownCount++;
+          } else {
+            item.style.display = 'none';
+            item.hidden = true;
+          }
+        } else {
+          item.style.display = 'none';
+          item.hidden = true;
+        }
+      });
+
+      if (loadMoreContainer) {
+        if (matchCount > visibleCount) {
+          loadMoreContainer.style.display = '';
+        } else {
+          loadMoreContainer.style.display = 'none';
+        }
+      }
+    }
+
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        currentFilter = btn.dataset.filter || '*';
+        visibleCount = 9;
+
+        buttons.forEach((b) => {
+          const active = b === btn;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-pressed', String(active));
+        });
+
+        renderGrid();
+      });
+    });
+
+    if (loadMoreBtn) {
+      loadMoreBtn.addEventListener('click', () => {
+        visibleCount += increment;
+        renderGrid();
+      });
+    }
+
+    renderGrid();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initGalleryFilter);
+  } else {
+    initGalleryFilter();
+  }
+</script>

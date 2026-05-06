@@ -1,0 +1,80 @@
+---
+import { reviews } from '../data/reviews';
+
+const NAVER_PLACE_URL = "https://naver.me/x3cqLksq";
+---
+
+<section id="reviews" class="bg-white py-24 md:py-28 lg:py-36" data-animate="fade-up">
+  <div class="max-w-6xl mx-auto px-6 lg:px-8">
+    <header class="max-w-2xl mb-16 lg:mb-24">
+      <div class="flex items-center gap-3 text-[13px] tracking-[0.25em] text-[#6b6b6b] uppercase font-bold">
+        <span class="inline-block w-2 h-2 rounded-full bg-[#ff7a1a]"></span>
+        <span>Customer Reviews</span>
+      </div>
+      <h2 
+        class="mt-8 font-black leading-tight text-[#1a1a1a] tracking-tight"
+        style="font-size: clamp(1.75rem, 3.5vw, 2.2rem);"
+      >
+        시공 후기
+      </h2>
+      <p class="mt-8 text-[17px] md:text-[18px] leading-8 text-[#6b6b6b] font-light">
+        네이버 예약, 카카오톡 채널, 인스타그램 등을 통해 자주 들었던 후기들을 정리한 예시입니다.<br class="hidden md:block" />
+        실제 후기는 네이버 플레이스에서 확인하실 수 있습니다.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+      {reviews.map((review, idx) => (
+        <article
+          class="review-card p-8 bg-[#f8f7f4] rounded-sm border border-[#ececec] flex flex-col justify-between"
+          data-animate="fade-up"
+          data-animate-delay={idx * 100}
+        >
+          <div>
+            <div class="mb-6">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ff7a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2H5c-1.25 0-2 .75-2 2v3c0 1.25.75 2 2 2h3c0 4-2 6-5 6"></path>
+                <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.75-2-2-2h-3c-1.25 0-2 .75-2 2v3c0 1.25.75 2 2 2h3c0 4-2 6-5 6"></path>
+              </svg>
+            </div>
+            <p class="text-[16px] leading-8 text-[#1a1a1a] font-normal">
+              {review.body}
+            </p>
+          </div>
+          <div class="mt-8 text-xs text-[#6b6b6b] tracking-wider text-right">
+            · {review.author}
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <style>
+      .review-card {
+        transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1),
+                    border-color 250ms ease;
+      }
+      .review-card:hover {
+        transform: translateY(-2px);
+        border-color: #d4d4d4;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .review-card:hover { transform: none; }
+      }
+    </style>
+
+    <div class="mt-12 lg:mt-16 text-center">
+      <a 
+        href={NAVER_PLACE_URL} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-2 px-8 py-4 text-sm font-bold border border-[#ececec] rounded-sm text-[#1a1a1a] hover:bg-[#f8f7f4] transition-colors"
+      >
+        <span>네이버 플레이스에서 실제 후기 보기</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <line x1="7" y1="17" x2="17" y2="7"></line>
+          <polyline points="7 7 17 7 17 17"></polyline>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

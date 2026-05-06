@@ -1,0 +1,113 @@
+---
+import Icon from './Icon.astro';
+
+const COMPANY_NAME = "프로랩 인테리어필름 (PROWRAP)";
+const ADDRESS = "경기도 고양시 덕양구 의장로 146 1903호";
+const PHONE = "010-5074-1018";
+const PHONE_LINK = "tel:01050741018";
+
+const MAP_NAVER = "https://naver.me/x3cqLksq";
+const MAP_KAKAO = "https://kko.kakao.com/f0nvh2Zrsg";
+
+const SNS_LINKS = [
+  { name: 'Instagram', url: 'https://www.instagram.com/prowrap_kr/', icon: 'instagram' },
+  { name: 'YouTube', url: 'https://www.youtube.com/@PROWRAP_KR', icon: 'youtube' },
+  { name: 'Kakao', url: 'https://pf.kakao.com/_xoxilmn', icon: 'kakao' },
+  { name: 'Naver Blog', url: 'https://m.blog.naver.com/milli1018', icon: 'naver' },
+];
+---
+
+<section id="contact" class="bg-[#f8f7f4] py-24 md:py-28 lg:py-36" data-animate="fade-up">
+  <div class="max-w-6xl mx-auto px-6 lg:px-8">
+    <header class="max-w-2xl mb-16 lg:mb-24">
+      <div class="flex items-center gap-3 text-[13px] tracking-[0.25em] text-[#6b6b6b] uppercase font-bold">
+        <span class="inline-block w-2 h-2 rounded-full bg-[#ff7a1a]"></span>
+        <span>Location & Contact</span>
+      </div>
+      <h2 
+        class="mt-8 font-black leading-tight text-[#1a1a1a] tracking-tight"
+        style="font-size: clamp(1.75rem, 3.5vw, 2.2rem);"
+      >
+        상담부터 시공까지<br class="md:hidden" /> 현장으로 달려갑니다
+      </h2>
+      <p class="mt-8 text-[17px] md:text-[18px] leading-8 text-[#6b6b6b] font-light">
+        고양·파주를 기점으로 인천과 서울 전 지역으로 시공을 나갑니다.<br class="hidden md:block" />
+        방문 전 미리 연락주시면 더 상세한 상담이 가능합니다.
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-20">
+      <div class="space-y-10">
+        <div class="pb-10 border-b border-[#ececec]">
+          <div class="text-sm text-[#6b6b6b] mb-2 uppercase tracking-widest">{COMPANY_NAME}</div>
+          <div class="text-xl md:text-2xl font-bold text-[#1a1a1a] mb-6">{ADDRESS}</div>
+          <div class="flex flex-wrap gap-3">
+            <a href={MAP_NAVER} target="_blank" rel="noopener noreferrer" class="px-6 py-2.5 bg-white border border-[#ececec] rounded-sm text-sm font-medium hover:bg-[#f3f2f0] transition-colors flex items-center gap-2">
+              <Icon name="naver" size={14} class="text-[#03c75a]" />
+              네이버 지도
+            </a>
+            <a href={MAP_KAKAO} target="_blank" rel="noopener noreferrer" class="px-6 py-2.5 bg-white border border-[#ececec] rounded-sm text-sm font-medium hover:bg-[#f3f2f0] transition-colors flex items-center gap-2">
+              <Icon name="kakao" size={14} class="text-[#3c1e1e]" />
+              카카오 맵
+            </a>
+          </div>
+        </div>
+
+        <div class="space-y-6">
+          <div class="flex gap-8 md:gap-16 items-baseline group">
+            <span class="w-20 text-sm font-bold text-[#1a1a1a] shrink-0">오시는 길</span>
+            <div class="text-[16px] text-[#6b6b6b] leading-7">
+              주차 및 자세한 위치 안내는 상담 시 상세히 안내드립니다.
+            </div>
+          </div>
+          
+          <div class="flex gap-8 md:gap-16 items-baseline group">
+            <span class="w-20 text-[15px] font-black text-[#1a1a1a] shrink-0">전화번호</span>
+            <div class="text-[17px] text-[#1a1a1a] font-black">
+              <a href={PHONE_LINK} class="hover:text-[#ff7a1a] transition-colors">{PHONE}</a>
+            </div>
+          </div>
+
+          <div class="flex gap-8 md:gap-16 items-baseline group">
+            <span class="w-20 text-sm font-bold text-[#1a1a1a] shrink-0">이용 안내</span>
+            <div class="text-[15px] text-[#6b6b6b] leading-7 flex flex-col gap-1">
+              <span>· 24시간 상담 가능 (사전 예약)</span>
+              <span>· 카카오톡 / 문자 견적 가능</span>
+            </div>
+          </div>
+
+          <div class="flex gap-8 md:gap-16 items-baseline group">
+            <span class="w-20 text-sm font-bold text-[#1a1a1a] shrink-0">사업자정보</span>
+            <div class="text-[15px] text-[#6b6b6b] leading-7">
+              <div>대표: 우선찬</div>
+              <div>상호: PROWRAP Interior</div>
+              <div class="text-xs mt-1 text-[#a0a0a0]">고양 · 파주 · 인천 · 서울 서비스</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-8 md:p-10 rounded-sm border border-[#ececec]">
+        <h3 class="text-xs tracking-[0.2em] text-[#6b6b6b] uppercase mb-8">Social Channels</h3>
+        <div class="grid grid-cols-2 gap-4">
+          {SNS_LINKS.map((sns) => (
+            <a 
+              href={sns.url} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="flex flex-col items-center justify-center gap-4 p-6 rounded-sm border border-[#f3f2f0] hover:border-[#ff7a1a] hover:bg-[#f8f7f4] transition-all group"
+            >
+              <div class="text-[#1a1a1a] group-hover:text-[#ff7a1a] transition-colors">
+                <Icon name={sns.icon as any} size={32} />
+              </div>
+              <span class="text-xs font-bold text-[#6b6b6b] group-hover:text-[#1a1a1a] transition-colors">{sns.name}</span>
+            </a>
+          ))}
+        </div>
+        <p class="mt-8 text-xs text-[#6b6b6b] leading-5 text-center">
+          시공 현장의 더 많은 작업 과정과<br /> 전·후 비교 사진을 소셜 채널에서 확인하세요.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>

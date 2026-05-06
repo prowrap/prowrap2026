@@ -1,0 +1,88 @@
+---
+import '../styles/global.css';
+import SEO from '../components/SEO.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  noindex?: boolean;
+}
+
+const { title, description, ogImage, noindex } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <link
+      rel="preload"
+      href="/fonts/Pretendard-Regular.subset.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/Pretendard-Bold.subset.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      href="/fonts/Pretendard-Black.subset.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
+    <title>{title ?? '프로랩 인테리어필름 | 고양·파주 정품 필름 시공 전문 PROWRAP'}</title>
+
+    <SEO title={title} description={description} ogImage={ogImage} noindex={noindex} />
+  </head>
+  <body class="bg-pw-bg text-pw-text antialiased">
+    <slot name="header" />
+
+    <main>
+      <slot />
+    </main>
+
+    <slot name="footer" />
+
+    <slot name="floating" />
+
+    <script>
+      const items = document.querySelectorAll<HTMLElement>('[data-animate]');
+      if (items.length > 0 && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const el = entry.target as HTMLElement;
+                const delay = el.dataset.animateDelay;
+                if (delay) {
+                  el.style.transitionDelay = `${delay}ms`;
+                }
+                el.classList.add('is-visible');
+                io.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.05, rootMargin: '0px' }
+        );
+        items.forEach((item) => io.observe(item));
+      } else {
+        items.forEach((item) => item.classList.add('is-visible'));
+      }
+    </script>
+  </body>
+</html>

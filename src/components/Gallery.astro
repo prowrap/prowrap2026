@@ -1,0 +1,277 @@
+---
+
+import type { ImageMetadata } from 'astro';
+import { Image, getImage } from 'astro:assets';
+import GalleryFilter from './GalleryFilter.astro';
+import Icon from './Icon.astro';
+import {
+  formatCaption,
+  getBaseName,
+  getGroupId,
+} from '../data/captions';
+import {
+  getCategoriesForPath,
+  stripCategorySuffix,
+} from '../data/spaceMapping';
+
+const modules = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/gallery/**/*.{jpg,jpeg,png,webp,JPG,PNG}',
+  { eager: true }
+);
+
+type GalleryItem = {
+  src: ImageMetadata;
+  lightboxSrc: string;
+  path: string;
+  groupId: string;
+  caption: string;
+  categories: string[];
+};
+
+const rawItems = Object.entries(modules)
+  .map(([path, mod]) => {
+    const base = getBaseName(path);
+    const cleanBase = stripCategorySuffix(base);
+    return {
+      src: mod.default,
+      path,
+      groupId: getGroupId(cleanBase),
+      caption: formatCaption(cleanBase),
+      categories: getCategoriesForPath(path),
+    };
+  })
+  .filter((it) => it.categories.length > 0)
+  .sort((a, b) => a.groupId.localeCompare(b.groupId));
+
+const items: GalleryItem[] = await Promise.all(
+  rawItems.map(async (it) => {
+    const optimized = await getImage({ src: it.src, format: 'webp', width: 1440 });
+    return { ...it, lightboxSrc: optimized.src };
+  })
+);
+
+const isEmpty = items.length === 0;
+---
+
+<section
+  id="gallery"
+  class="bg-white py-24 md:py-28 lg:py-36 border-t border-[#ececec]"
+  data-animate="fade-up"
+>
+  <div class="max-w-6xl mx-auto px-6 lg:px-8">
+    <header class="max-w-2xl mb-12 lg:mb-16">
+      <div class="flex items-center gap-3 text-xs tracking-[0.2em] text-[#6b6b6b] uppercase">
+        <span class="inline-block w-1.5 h-1.5 rounded-full bg-[#ff7a1a]"></span>
+        <span>Project Gallery</span>
+      </div>
+
+      <h2
+        class="mt-6 font-bold leading-snug text-[#1a1a1a]"
+        style="font-size: clamp(1.6rem, 2.4vw, 1.9rem);"
+      >
+        시공 갤러리
+      </h2>
+
+      <p class="mt-5 text-[15px] leading-7 text-[#6b6b6b]">
+        PROWRAP의 다양한 현장 결과물을 확인해 보세요. 공간별로 분류해 두었으며, 클릭하면 큰 화면으로 자재를 확인할 수 있습니다.
+      </p>
+    </header>
+
+    <div class="mb-10 -mx-1 overflow-x-auto">
+      <GalleryFilter />
+    </div>
+
+    {isEmpty ? (
+      <div class="border border-dashed border-[#ececec] py-20 text-center text-[#6b6b6b] text-sm">
+        갤러리 이미지를 준비 중입니다.
+      </div>
+    ) : (
+      <ul
+        id="gallery-grid"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+      >
+        {items.map((it, i) => (
+          <li
+            class="gallery-item group relative overflow-hidden rounded-sm bg-[#f8f7f4]"
+            data-categories={it.categories.join(' ')}
+            data-caption={it.caption}
+            data-index={i}
+          >
+            <button
+              type="button"
+              class="block w-full text-left"
+              data-lightbox-open
+              data-lightbox-src={it.lightboxSrc}
+              data-index={i}
+              aria-label={it.caption || '시공 사진 보기'}
+            >
+              <div class="aspect-[4/3] w-full overflow-hidden">
+                <Image
+                  src={it.src}
+                  alt={it.caption || '인테리어필름 시공 사진'}
+                  loading="lazy"
+                  decoding="async"
+                  widths={[400, 800]}
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
+
+              {it.caption && (
+                <div
+                  class="pointer-events-none absolute inset-x-0 bottom-0 px-4 py-3
+                         bg-gradient-to-t from-black/70 to-transparent
+                         opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                >
+                  <span class="text-white text-[13px] tracking-wide">
+                    {it.caption}
+                  </span>
+                </div>
+              )}
+            </button>
+          </li>
+        ))}
+      </ul>
+    )}
+    
+    {!isEmpty && (
+      <div class="mt-12 text-center" id="load-more-container">
+        <button
+          type="button"
+          id="load-more-btn"
+          class="inline-flex items-center justify-center px-8 py-3.5 border border-[#ececec] text-[14px] font-bold tracking-wide text-[#1a1a1a] bg-white hover:bg-[#f8f7f4] hover:border-[#d4d4d4] rounded-sm transition-all"
+        >
+          더보기 (Load More)
+        </button>
+      </div>
+    )}
+  </div>
+
+  <div
+    id="lightbox"
+    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 px-4"
+    role="dialog"
+    aria-modal="true"
+    aria-label="확대 보기"
+  >
+    <button
+      type="button"
+      class="absolute top-5 right-5 text-white/80 hover:text-white p-2"
+      data-lightbox-close
+      aria-label="닫기"
+    >
+      <Icon name="close" size={24} />
+    </button>
+
+    <button
+      type="button"
+      class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none"
+      data-lightbox-prev
+      aria-label="이전"
+    >
+      ‹
+    </button>
+
+    <figure class="max-w-[92vw] max-h-[88vh] flex flex-col items-center gap-3">
+      <img
+        id="lightbox-img"
+        src=""
+        alt=""
+        class="max-w-full max-h-[78vh] object-contain"
+      />
+      <figcaption
+        id="lightbox-caption"
+        class="text-white/85 text-sm tracking-wide text-center min-h-[1.25em]"
+      ></figcaption>
+    </figure>
+
+    <button
+      type="button"
+      class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none"
+      data-lightbox-next
+      aria-label="다음"
+    >
+      ›
+    </button>
+  </div>
+</section>
+
+<script>
+  type LBItem = { src: string; caption: string };
+
+  function initLightbox() {
+    const root = document.getElementById('lightbox');
+    const imgEl = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const capEl = document.getElementById('lightbox-caption');
+    if (!root || !imgEl || !capEl) return;
+
+    const triggers = document.querySelectorAll<HTMLButtonElement>('[data-lightbox-open]');
+    const list: LBItem[] = Array.from(triggers).map((btn) => {
+      const src = btn.dataset.lightboxSrc || '';
+      const item = btn.closest('.gallery-item') as HTMLElement | null;
+      const caption = item?.dataset.caption ?? '';
+      return { src, caption };
+    });
+
+    let current = 0;
+
+    function open(index: number) {
+      current = index;
+      render();
+      root!.classList.remove('hidden');
+      root!.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    }
+    function close() {
+      root!.classList.add('hidden');
+      root!.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+    function move(delta: number) {
+      const visible = Array.from(triggers)
+        .map((btn, i) => ({ i, hidden: (btn.closest('.gallery-item') as HTMLElement).hidden }))
+        .filter((x) => !x.hidden)
+        .map((x) => x.i);
+      if (!visible.length) return;
+      const pos = visible.indexOf(current);
+      const next = visible[(pos + delta + visible.length) % visible.length];
+      current = next;
+      render();
+    }
+    function render() {
+      const it = list[current];
+      if (!it || !imgEl || !capEl) return;
+      imgEl.src = it.src;
+      imgEl.alt = it.caption;
+      capEl.textContent = it.caption;
+    }
+
+    triggers.forEach((btn, i) => {
+      btn.addEventListener('click', () => open(i));
+    });
+
+    root.querySelector('[data-lightbox-close]')
+      ?.addEventListener('click', close);
+    root.querySelector('[data-lightbox-prev]')
+      ?.addEventListener('click', () => move(-1));
+    root.querySelector('[data-lightbox-next]')
+      ?.addEventListener('click', () => move(1));
+
+    root.addEventListener('click', (e) => {
+      if (e.target === root) close();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (root.classList.contains('hidden')) return;
+      if (e.key === 'Escape') close();
+      else if (e.key === 'ArrowLeft') move(-1);
+      else if (e.key === 'ArrowRight') move(1);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLightbox);
+  } else {
+    initLightbox();
+  }
+</script>
