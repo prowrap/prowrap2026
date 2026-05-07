@@ -146,55 +146,56 @@ const isEmpty = items.length === 0;
       </div>
     )}
   </div>
-
-  <div
-    id="lightbox"
-    class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 px-4"
-    role="dialog"
-    aria-modal="true"
-    aria-label="확대 보기"
-  >
-    <button
-      type="button"
-      class="absolute top-5 right-5 text-white/80 hover:text-white p-2"
-      data-lightbox-close
-      aria-label="닫기"
-    >
-      <Icon name="close" size={24} />
-    </button>
-
-    <button
-      type="button"
-      class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none"
-      data-lightbox-prev
-      aria-label="이전"
-    >
-      ‹
-    </button>
-
-    <figure class="max-w-[92vw] max-h-[88vh] flex flex-col items-center gap-3">
-      <img
-        id="lightbox-img"
-        src=""
-        alt=""
-        class="max-w-full max-h-[78vh] object-contain"
-      />
-      <figcaption
-        id="lightbox-caption"
-        class="text-white/85 text-sm tracking-wide text-center min-h-[1.25em]"
-      ></figcaption>
-    </figure>
-
-    <button
-      type="button"
-      class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none"
-      data-lightbox-next
-      aria-label="다음"
-    >
-      ›
-    </button>
-  </div>
 </section>
+
+{/* Lightbox는 반드시 [data-animate] (transform 적용) 밖에 위치해야 position:fixed 가 viewport 기준으로 동작합니다. */}
+<div
+  id="lightbox"
+  class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 px-4"
+  role="dialog"
+  aria-modal="true"
+  aria-label="확대 보기"
+>
+  <button
+    type="button"
+    class="absolute top-5 right-5 text-white/80 hover:text-white p-2"
+    data-lightbox-close
+    aria-label="닫기"
+  >
+    <Icon name="close" size={24} />
+  </button>
+
+  <button
+    type="button"
+    class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none"
+    data-lightbox-prev
+    aria-label="이전"
+  >
+    ‹
+  </button>
+
+  <figure class="max-w-[92vw] max-h-[88vh] flex flex-col items-center gap-3">
+    <img
+      id="lightbox-img"
+      src=""
+      alt=""
+      class="max-w-full max-h-[78vh] object-contain"
+    />
+    <figcaption
+      id="lightbox-caption"
+      class="text-white/85 text-sm tracking-wide text-center min-h-[1.25em]"
+    ></figcaption>
+  </figure>
+
+  <button
+    type="button"
+    class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none"
+    data-lightbox-next
+    aria-label="다음"
+  >
+    ›
+  </button>
+</div>
 
 <script>
   type LBItem = { src: string; caption: string };
