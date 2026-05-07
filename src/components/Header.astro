@@ -138,9 +138,9 @@ const navItems = [
   }
   #site-header[data-on-dark="false"] .header-menu-btn { color: #0a0a0a; }
 
-  /* 헤더 다크 모드 (Hero 배경 위) */
+  /* 헤더 다크 모드 (Hero 배경 위) — 라인/띠 없음, 인라인 스타일이 배경을 결정 */
   #site-header[data-on-dark="true"] {
-    background: linear-gradient(to bottom, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%);
+    background: transparent;
   }
   #site-header[data-on-dark="true"] .header-logo-main { color: #ffffff; }
   #site-header[data-on-dark="true"] .header-logo-sub { color: rgba(255,255,255,0.7); }
@@ -200,19 +200,22 @@ const navItems = [
       if (inHero && !scrolled) {
         header.dataset.onDark = 'true';
         header.classList.remove('header-scrolled');
-        header.style.background = '';
-        header.style.backdropFilter = '';
-        header.style.borderBottom = '';
+        header.style.background = 'transparent';
+        header.style.backdropFilter = 'none';
+        header.style.borderBottom = '1px solid transparent';
+        header.style.boxShadow = 'none';
       } else if (inHero && scrolled) {
         header.dataset.onDark = 'true';
-        header.style.background = 'rgba(5,5,5,0.85)';
-        header.style.backdropFilter = 'saturate(1.4) blur(10px)';
-        header.style.borderBottom = '1px solid rgba(255,255,255,0.08)';
+        header.style.background = 'rgba(5,5,5,0.7)';
+        header.style.backdropFilter = 'saturate(1.4) blur(12px)';
+        header.style.borderBottom = '1px solid transparent';
+        header.style.boxShadow = 'none';
       } else {
         header.dataset.onDark = 'false';
-        header.style.background = 'rgba(255,255,255,0.96)';
-        header.style.backdropFilter = 'saturate(1.4) blur(10px)';
-        header.style.borderBottom = '1px solid #ececec';
+        header.style.background = 'rgba(255,255,255,0.94)';
+        header.style.backdropFilter = 'saturate(1.4) blur(12px)';
+        header.style.borderBottom = '1px solid transparent';
+        header.style.boxShadow = '0 8px 22px rgba(0,0,0,0.05)';
       }
     } else {
       header.dataset.onDark = 'false';
