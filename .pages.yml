@@ -9,6 +9,7 @@ content:
     path: src/data/gallery
     type: collection
     format: json
+    filename: "gallery-{year}{month}{day}-{hour}{minute}{second}.json"
     view:
       primary: caption
       fields: [caption, sections, order]
