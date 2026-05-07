@@ -6,9 +6,9 @@ media:
 content:
   - name: gallery
     label: 갤러리 이미지
-    label_singular: 이미지 항목
     path: src/data/gallery
     type: collection
+    format: json
     view:
       primary: caption
       fields: [caption, sections, order]
@@ -22,31 +22,30 @@ content:
         label: 공간 구분
         type: select
         required: true
-        list: true
         options:
           values:
-            - value: home
+            - name: home
               label: 주거 공간
-            - value: work
+            - name: work
               label: 사무 공간
-            - value: kitchen
+            - name: kitchen
               label: 주방
-            - value: door
+            - name: door
               label: 방문·문
-            - value: window
+            - name: window
               label: 샷시·창호
-            - value: furniture
+            - name: furniture
               label: 가구
-            - value: entrance
+            - name: entrance
               label: 현관
+          multiple: true
+          min: 1
 
       - name: caption
         label: 자재명·설명
         type: string
-        hint: "예시: 현대Bodaq SPW48 | 영림 PX449"
 
       - name: order
         label: 표시 순서 (작을수록 앞에 표시)
         type: number
         default: 99000
-        hint: "같은 공간 내에서 숫자가 작을수록 앞에 표시됩니다."
