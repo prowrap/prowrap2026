@@ -109,7 +109,7 @@ const isEmpty = items.length === 0;
                 <Image
                   src={it.src}
                   alt={it.caption || '인테리어필름 시공 사진'}
-                  loading="lazy"
+                  loading={i < 6 ? "eager" : "lazy"}
                   decoding="async"
                   widths={[400, 800]}
                   sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
