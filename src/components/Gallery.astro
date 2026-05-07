@@ -4,17 +4,27 @@ import type { ImageMetadata } from 'astro';
 import { Image, getImage } from 'astro:assets';
 import GalleryFilter from './GalleryFilter.astro';
 import Icon from './Icon.astro';
-import {
-  formatCaption,
-  getBaseName,
-  getGroupId,
-} from '../data/captions';
-import {
-  getCategoriesForPath,
-  stripCategorySuffix,
-} from '../data/spaceMapping';
+import type { SpaceKey } from '../data/spaceMapping';
 
-const modules = import.meta.glob<{ default: ImageMetadata }>(
+// ── JSON 컬렉션 로드 (Pages CMS가 관리하는 파일들) ─────────────
+type GalleryEntry = {
+  image: string;       // "/src/assets/gallery/.../filename.jpg"
+  sections: SpaceKey[];
+  caption: string;
+  order: number;
+};
+
+const entryModules = import.meta.glob<{ default: GalleryEntry }>(
+  '/src/data/gallery/*.json',
+  { eager: true }
+);
+
+const entries: GalleryEntry[] = Object.values(entryModules)
+  .map((m) => m.default)
+  .sort((a, b) => a.order - b.order || a.image.localeCompare(b.image));
+
+// ── 이미지 파일 로드 (빌드타임 최적화용) ──────────────────────
+const imageModules = import.meta.glob<{ default: ImageMetadata }>(
   '/src/assets/gallery/**/*.{jpg,jpeg,png,webp,JPG,PNG}',
   { eager: true }
 );
@@ -22,33 +32,25 @@ const modules = import.meta.glob<{ default: ImageMetadata }>(
 type GalleryItem = {
   src: ImageMetadata;
   lightboxSrc: string;
-  path: string;
-  groupId: string;
+  sections: SpaceKey[];
   caption: string;
-  categories: string[];
 };
 
-const rawItems = Object.entries(modules)
-  .map(([path, mod]) => {
-    const base = getBaseName(path);
-    const cleanBase = stripCategorySuffix(base);
-    return {
-      src: mod.default,
-      path,
-      groupId: getGroupId(cleanBase),
-      caption: formatCaption(cleanBase),
-      categories: getCategoriesForPath(path),
-    };
-  })
-  .filter((it) => it.categories.length > 0)
-  .sort((a, b) => a.groupId.localeCompare(b.groupId));
-
-const items: GalleryItem[] = await Promise.all(
-  rawItems.map(async (it) => {
-    const optimized = await getImage({ src: it.src, format: 'webp', width: 1440 });
-    return { ...it, lightboxSrc: optimized.src };
-  })
-);
+const items: GalleryItem[] = (
+  await Promise.all(
+    entries.map(async (entry) => {
+      const mod = imageModules[entry.image];
+      if (!mod) return null;
+      const optimized = await getImage({ src: mod.default, format: 'webp', width: 1440 });
+      return {
+        src: mod.default,
+        lightboxSrc: optimized.src,
+        sections: entry.sections,
+        caption: entry.caption,
+      };
+    })
+  )
+).filter((x): x is GalleryItem => x !== null);
 
 const isEmpty = items.length === 0;
 ---
@@ -93,7 +95,7 @@ const isEmpty = items.length === 0;
         {items.map((it, i) => (
           <li
             class="gallery-item group relative overflow-hidden rounded-sm bg-[#f8f7f4]"
-            data-categories={it.categories.join(' ')}
+            data-categories={it.sections.join(' ')}
             data-caption={it.caption}
             data-index={i}
           >

@@ -1,0 +1,52 @@
+media:
+  # 클라이언트가 업로드한 이미지가 저장되는 경로 (git 레포 내부)
+  input: src/assets/gallery/uploads
+  output: /src/assets/gallery/uploads
+
+content:
+  - name: gallery
+    label: 갤러리 이미지
+    label_singular: 이미지 항목
+    path: src/data/gallery
+    type: collection
+    view:
+      primary: caption
+      fields: [caption, sections, order]
+    fields:
+      - name: image
+        label: 이미지 파일
+        type: image
+        required: true
+
+      - name: sections
+        label: 공간 구분
+        type: select
+        required: true
+        list: true
+        options:
+          values:
+            - value: home
+              label: 주거 공간
+            - value: work
+              label: 사무 공간
+            - value: kitchen
+              label: 주방
+            - value: door
+              label: 방문·문
+            - value: window
+              label: 샷시·창호
+            - value: furniture
+              label: 가구
+            - value: entrance
+              label: 현관
+
+      - name: caption
+        label: 자재명·설명
+        type: string
+        hint: "예시: 현대Bodaq SPW48 | 영림 PX449"
+
+      - name: order
+        label: 표시 순서 (작을수록 앞에 표시)
+        type: number
+        default: 99000
+        hint: "같은 공간 내에서 숫자가 작을수록 앞에 표시됩니다."
