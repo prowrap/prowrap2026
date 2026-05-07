@@ -151,14 +151,14 @@ const isEmpty = items.length === 0;
 {/* Lightbox는 반드시 [data-animate] (transform 적용) 밖에 위치해야 position:fixed 가 viewport 기준으로 동작합니다. */}
 <div
   id="lightbox"
-  class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/90 px-4"
+  class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/92 px-4"
   role="dialog"
   aria-modal="true"
   aria-label="확대 보기"
 >
   <button
     type="button"
-    class="absolute top-5 right-5 text-white/80 hover:text-white p-2"
+    class="absolute top-5 right-5 text-white/80 hover:text-white p-2 z-10"
     data-lightbox-close
     aria-label="닫기"
   >
@@ -167,20 +167,41 @@ const isEmpty = items.length === 0;
 
   <button
     type="button"
-    class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none"
+    class="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none z-10"
     data-lightbox-prev
     aria-label="이전"
   >
     ‹
   </button>
 
-  <figure class="max-w-[92vw] max-h-[88vh] flex flex-col items-center gap-3">
-    <img
-      id="lightbox-img"
-      src=""
-      alt=""
-      class="max-w-full max-h-[78vh] object-contain"
-    />
+  <figure class="relative max-w-[92vw] max-h-[88vh] flex flex-col items-center gap-3">
+    <div class="relative max-w-full max-h-[78vh] flex items-center justify-center">
+      {/* 썸네일 즉시 표시 (블러 처리) */}
+      <img
+        id="lightbox-thumb"
+        src=""
+        alt=""
+        aria-hidden="true"
+        class="absolute inset-0 w-full h-full object-contain blur-sm scale-[1.02] opacity-0 transition-opacity duration-200"
+      />
+      {/* 고해상도 — 로드 완료 시 페이드인 */}
+      <img
+        id="lightbox-img"
+        src=""
+        alt=""
+        decoding="async"
+        fetchpriority="high"
+        class="relative max-w-full max-h-[78vh] object-contain opacity-0 transition-opacity duration-300"
+      />
+      {/* 스피너 */}
+      <div
+        id="lightbox-spinner"
+        class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-200"
+        aria-hidden="true"
+      >
+        <span class="block w-8 h-8 rounded-full border-2 border-white/25 border-t-white/85 animate-spin"></span>
+      </div>
+    </div>
     <figcaption
       id="lightbox-caption"
       class="text-white/85 text-sm tracking-wide text-center min-h-[1.25em]"
@@ -189,7 +210,7 @@ const isEmpty = items.length === 0;
 
   <button
     type="button"
-    class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none"
+    class="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 text-white/70 hover:text-white p-3 text-3xl leading-none z-10"
     data-lightbox-next
     aria-label="다음"
   >
@@ -198,23 +219,77 @@ const isEmpty = items.length === 0;
 </div>
 
 <script>
-  type LBItem = { src: string; caption: string };
+  type LBItem = { src: string; caption: string; thumbSrc: string };
 
   function initLightbox() {
     const root = document.getElementById('lightbox');
     const imgEl = document.getElementById('lightbox-img') as HTMLImageElement | null;
+    const thumbEl = document.getElementById('lightbox-thumb') as HTMLImageElement | null;
+    const spinnerEl = document.getElementById('lightbox-spinner');
     const capEl = document.getElementById('lightbox-caption');
     if (!root || !imgEl || !capEl) return;
 
     const triggers = document.querySelectorAll<HTMLButtonElement>('[data-lightbox-open]');
+
+    /* 썸네일 currentSrc 추출 — 즉시 placeholder 로 사용 */
     const list: LBItem[] = Array.from(triggers).map((btn) => {
       const src = btn.dataset.lightboxSrc || '';
       const item = btn.closest('.gallery-item') as HTMLElement | null;
       const caption = item?.dataset.caption ?? '';
-      return { src, caption };
+      const thumbImg = item?.querySelector('img') as HTMLImageElement | null;
+      const thumbSrc = thumbImg?.currentSrc || thumbImg?.src || '';
+      return { src, caption, thumbSrc };
+    });
+
+    /* 프리로드 캐시 — 같은 이미지 중복 요청 방지 */
+    const preloaded = new Set<string>();
+    function preload(src: string) {
+      if (!src || preloaded.has(src)) return;
+      preloaded.add(src);
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = src;
+    }
+
+    /* 마우스오버/포커스 시 해당 이미지 프리로드 */
+    triggers.forEach((btn) => {
+      const src = btn.dataset.lightboxSrc || '';
+      const trigger = () => preload(src);
+      btn.addEventListener('mouseenter', trigger, { once: true });
+      btn.addEventListener('focus', trigger, { once: true });
+      btn.addEventListener('touchstart', trigger, { once: true, passive: true });
+    });
+
+    /* idle 시점에 첫 4장만 백그라운드 프리로드 — 첫 클릭 즉시 표시 */
+    const idle = (cb: () => void) => {
+      // @ts-ignore
+      if ('requestIdleCallback' in window) (window as any).requestIdleCallback(cb, { timeout: 2500 });
+      else setTimeout(cb, 1500);
+    };
+    idle(() => {
+      list.slice(0, 4).forEach((it) => preload(it.src));
     });
 
     let current = 0;
+    let pendingSrc = '';
+
+    function getVisibleIndexes(): number[] {
+      return Array.from(triggers)
+        .map((btn, i) => ({ i, hidden: (btn.closest('.gallery-item') as HTMLElement).hidden }))
+        .filter((x) => !x.hidden)
+        .map((x) => x.i);
+    }
+
+    function preloadNeighbors() {
+      const visible = getVisibleIndexes();
+      if (!visible.length) return;
+      const pos = visible.indexOf(current);
+      if (pos < 0) return;
+      const nextIdx = visible[(pos + 1) % visible.length];
+      const prevIdx = visible[(pos - 1 + visible.length) % visible.length];
+      preload(list[nextIdx]?.src);
+      preload(list[prevIdx]?.src);
+    }
 
     function open(index: number) {
       current = index;
@@ -222,6 +297,7 @@ const isEmpty = items.length === 0;
       root!.classList.remove('hidden');
       root!.classList.add('flex');
       document.body.style.overflow = 'hidden';
+      preloadNeighbors();
     }
     function close() {
       root!.classList.add('hidden');
@@ -229,22 +305,61 @@ const isEmpty = items.length === 0;
       document.body.style.overflow = '';
     }
     function move(delta: number) {
-      const visible = Array.from(triggers)
-        .map((btn, i) => ({ i, hidden: (btn.closest('.gallery-item') as HTMLElement).hidden }))
-        .filter((x) => !x.hidden)
-        .map((x) => x.i);
+      const visible = getVisibleIndexes();
       if (!visible.length) return;
       const pos = visible.indexOf(current);
       const next = visible[(pos + delta + visible.length) % visible.length];
       current = next;
       render();
+      preloadNeighbors();
     }
+
     function render() {
       const it = list[current];
       if (!it || !imgEl || !capEl) return;
-      imgEl.src = it.src;
-      imgEl.alt = it.caption;
+
+      pendingSrc = it.src;
       capEl.textContent = it.caption;
+      imgEl.alt = it.caption;
+
+      /* 1) 썸네일을 즉시 placeholder 로 표시 */
+      if (thumbEl) {
+        thumbEl.src = it.thumbSrc;
+        thumbEl.alt = it.caption;
+        thumbEl.classList.remove('opacity-0');
+      }
+
+      /* 2) 캐시된 이미지면 스피너 생략, 아니면 200ms 후에만 스피너 노출 */
+      const isCached = preloaded.has(it.src);
+      imgEl.classList.add('opacity-0');
+      if (spinnerEl) spinnerEl.classList.add('opacity-0');
+
+      let spinnerTimer: number | null = null;
+      if (!isCached && spinnerEl) {
+        spinnerTimer = window.setTimeout(() => {
+          spinnerEl.classList.remove('opacity-0');
+        }, 180);
+      }
+
+      /* 3) 고해상도 로드 후 페이드인 */
+      const onLoad = () => {
+        if (pendingSrc !== it.src) return; // 다른 이미지로 이동한 경우 무시
+        if (spinnerTimer) clearTimeout(spinnerTimer);
+        if (spinnerEl) spinnerEl.classList.add('opacity-0');
+        imgEl.classList.remove('opacity-0');
+        if (thumbEl) {
+          /* 페이드인 후 썸네일은 살짝 늦게 숨김 — 깜빡임 방지 */
+          window.setTimeout(() => thumbEl.classList.add('opacity-0'), 320);
+        }
+        preloaded.add(it.src);
+      };
+
+      if (imgEl.complete && imgEl.src === it.src) {
+        onLoad();
+      } else {
+        imgEl.onload = onLoad;
+        imgEl.src = it.src;
+      }
     }
 
     triggers.forEach((btn, i) => {
