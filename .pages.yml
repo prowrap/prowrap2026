@@ -22,24 +22,22 @@ content:
         label: 공간 구분
         type: select
         required: true
+        list: true
         options:
-          values:
-            - name: home
-              label: 주거 공간
-            - name: work
-              label: 사무 공간
-            - name: kitchen
-              label: 주방
-            - name: door
-              label: 방문·문
-            - name: window
-              label: 샷시·창호
-            - name: furniture
-              label: 가구
-            - name: entrance
-              label: 현관
-          multiple: true
-          min: 1
+          - value: home
+            label: 주거 공간
+          - value: work
+            label: 사무 공간
+          - value: kitchen
+            label: 주방
+          - value: door
+            label: 방문·문
+          - value: window
+            label: 샷시·창호
+          - value: furniture
+            label: 가구
+          - value: entrance
+            label: 현관
 
       - name: caption
         label: 자재명·설명
