@@ -29,16 +29,10 @@ content:
               label: 주거 공간
             - value: work
               label: 사무 공간
-            - value: kitchen
-              label: 주방
-            - value: door
-              label: 방문·문
-            - value: window
-              label: 샷시·창호
+            - value: film studio
+             label: 영화/드라마 세트
             - value: furniture
               label: 가구
-            - value: entrance
-              label: 현관
 
       - name: caption
         label: 자재명·설명
