@@ -27,12 +27,14 @@ content:
           values:
             - value: home
               label: 주거 공간
-            - value: work
-              label: 사무 공간
-            - value: film studio
-             label: 영화/드라마 세트
-            - value: furniture
-              label: 가구
+            - value: commercial
+              label: 상업 공간
+            - value: set
+              label: 드라마·영화 세트
+            - value: sample
+              label: 필름 샘플
+            - value: detail
+              label: 디테일
 
       - name: caption
         label: 자재명·설명
