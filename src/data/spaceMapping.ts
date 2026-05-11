@@ -7,7 +7,7 @@ export type SpaceKey =
   | 'furniture'
   | 'entrance';
 
-export const sectionLabels: Record<SpaceKey, string> = {
+export const spaceLabels: Record<SpaceKey, string> = {
   home: "주거 공간",
   work: "상업 공간",
   film: "세트·크리에이티브",
