@@ -1,6 +1,7 @@
 export type SpaceKey =
   | 'home'
   | 'work'
+  | 'film'
   | 'kitchen'
   | 'door'
   | 'window'
@@ -10,6 +11,7 @@ export type SpaceKey =
 export const spaceLabels: Record<SpaceKey, string> = {
   home: "주거 공간",
   work: "상업 공간",
+  film: "드라마·영화 세트",
   kitchen: "디테일",
   door: "디테일",
   window: "디테일",
@@ -20,12 +22,14 @@ export const spaceLabels: Record<SpaceKey, string> = {
 export const filterOrder: SpaceKey[] = [
   'home',
   'work',
+  'film',
   'furniture',
 ];
 
 const SPACE_KEYS = new Set<SpaceKey>([
   'home',
   'work',
+  'film',
   'kitchen',
   'door',
   'window',
