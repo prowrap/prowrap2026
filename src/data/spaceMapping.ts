@@ -29,26 +29,65 @@ const SPACE_KEYS = new Set<SpaceKey>([
   'detail',
 ]);
 
+const LEGACY_SPACE_MAP: Record<string, SpaceKey> = {
+  work: 'commercial',
+  film: 'set',
+  film_studio: 'set',
+  'film studio': 'set',
+  kitchen: 'detail',
+  door: 'detail',
+  window: 'detail',
+  furniture: 'detail',
+  entrance: 'detail',
+  'door-entrance': 'detail',
+};
+
+export function normalizeSpaceKey(value: string): SpaceKey | null {
+  const key = value.trim();
+
+  if (SPACE_KEYS.has(key as SpaceKey)) {
+    return key as SpaceKey;
+  }
+
+  return LEGACY_SPACE_MAP[key] ?? null;
+}
+
+export function normalizeSpaceKeys(values: string[]): SpaceKey[] {
+  const result: SpaceKey[] = [];
+
+  values.forEach((value) => {
+    const key = normalizeSpaceKey(value);
+
+    if (key && !result.includes(key)) {
+      result.push(key);
+    }
+  });
+
+  return result;
+}
+
 export function getCategoriesForPath(path: string): SpaceKey[] {
   const result: SpaceKey[] = [];
 
   const folderMatch = path.match(/\/gallery\/([^/]+)\//);
-  if (folderMatch) {
-    const folderName = folderMatch[1];
 
-    if (SPACE_KEYS.has(folderName as SpaceKey)) {
-      result.push(folderName as SpaceKey);
+  if (folderMatch) {
+    const key = normalizeSpaceKey(folderMatch[1]);
+
+    if (key && !result.includes(key)) {
+      result.push(key);
     }
   }
 
   const file = path.split(/[\\/]/).pop() ?? '';
-  const tagRegex = /@([a-z]+)/g;
+  const tagRegex = /@([a-z_-]+)/g;
 
-  let m: RegExpExecArray | null;
-  while ((m = tagRegex.exec(file)) !== null) {
-    const key = m[1] as SpaceKey;
+  let match: RegExpExecArray | null;
 
-    if (SPACE_KEYS.has(key) && !result.includes(key)) {
+  while ((match = tagRegex.exec(file)) !== null) {
+    const key = normalizeSpaceKey(match[1]);
+
+    if (key && !result.includes(key)) {
       result.push(key);
     }
   }
@@ -57,5 +96,5 @@ export function getCategoriesForPath(path: string): SpaceKey[] {
 }
 
 export function stripCategorySuffix(baseName: string): string {
-  return baseName.replace(/@[a-z]+/g, '');
+  return baseName.replace(/@[a-z_-]+/g, '');
 }
