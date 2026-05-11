@@ -7,15 +7,13 @@ export type SpaceKey =
   | 'furniture'
   | 'entrance';
 
-export const spaceLabels: Record<SpaceKey, string> = {
-  home: '주거 공간',
-  work: '사무 공간',
-  kitchen: '주방',
-  door: '방문·문',
-  window: '샷시·창호',
-  furniture: '가구',
-  entrance: '현관',
-};
+export const sectionLabels: Record<SpaceKey, string> = {
+  home: "주거 공간",
+  work: "상업 공간",
+  film: "세트·크리에이티브",
+  furniture: "디테일",
+  entrance: "디테일"
+}
 
 export const filterOrder: SpaceKey[] = [
   'home',
