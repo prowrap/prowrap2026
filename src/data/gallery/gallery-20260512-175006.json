@@ -1,7 +1,8 @@
 {
   "image": "/src/assets/gallery/uploads/KakaoTalk_20260512_171111548_13.jpg",
   "sections": [
-    "home"
+    "home",
+    "detail"
   ],
   "caption": "영림PX449",
   "order": 15000
