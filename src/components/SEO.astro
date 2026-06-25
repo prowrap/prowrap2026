@@ -142,3 +142,21 @@ const faqSchema = {
 <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
 <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
 <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+<!-- Google Analytics -->
+<script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-HRCQZDVT8Z"></script>
+
+<script is:inline>
+window.dataLayer = window.dataLayer || [];
+
+function gtag() {
+  dataLayer.push(arguments);
+}
+
+gtag('js', new Date());
+
+gtag('config', 'G-HRCQZDVT8Z', {
+  send_page_view: true,
+  anonymize_ip: true
+});
+</script>
